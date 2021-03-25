@@ -1,0 +1,118 @@
+<div id="firebaseui-auth-container"></div>
+<div id="loader" <Loading...></div> 
+<div id="studatadiv"></div>
+<div id="signoutdiv"></div>
+
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.0/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet"         href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
+
+<script>
+var d1;
+var d2;
+
+var firebaseConfig = {
+  apiKey: "AIzaSyCXFxVsb2RgrmZWFz938_X-pH-tCCnnSpc",
+  authDomain: "algebracity-fab3f.firebaseapp.com",
+  databaseURL: "https://algebracity-fab3f.firebaseio.com",
+  projectId: "algebracity-fab3f",
+  storageBucket: "algebracity-fab3f.appspot.com",
+  messagingSenderId: "127479155889",
+  appId: "1:127479155889:web:5ae23f925bbfb34c78a690",
+  measurementId: "G-W35TRWPCXT"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+firebase.analytics();
+
+var ui = new firebaseui.auth.AuthUI(firebase.auth());
+  
+var uiConfig = {
+  callbacks: {
+    signInSuccessWithAuthResult: function(authResult) {
+      alert("somebody has signed in");
+
+      // User successfully signed in.
+      // Return type determines whether we continue the redirect automatically
+      // or whether we leave that to developer to handle.
+      return false;
+    },
+    uiShown: function() {
+      // The widget is rendered.
+      // Hide the loader.
+    	document.getElementById('loader').style.display = 'none';
+    }
+  },
+  signInOptions: [
+    firebase.auth.EmailAuthProvider.PROVIDER_ID,
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID
+  ]
+};
+  
+ui.start('#firebaseui-auth-container', uiConfig);
+  
+firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        //handle sign out button
+      	var btn = document.createElement("BUTTON");
+      	btn.innerHTML = "Sign Out";
+      	document.getElementById("signoutdiv").appendChild(btn);
+        btn.addEventListener("click", signOut);
+        
+        //data display
+        showData();
+        console.log("the auth state was changed to " + firebase.auth().currentUser.uid);
+      } else {
+        //no user is signed in
+      }
+});
+  
+  function signOut() {
+      firebase.auth().signOut().then(() => {
+        window.location.replace("https://functionofc.com/app/");
+        console.log("signout successful");
+        //signout successful
+      }).catch((error) => {
+        //an error happened
+      });
+  }
+  
+    function showData() {
+    //reference the specific elements in the database
+    var ref = firebase.database().ref().child("IDNums/225413");
+
+    var dataTbl = document.createElement("TABLE");
+    ref.once("value", function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        d2 = childSnapshot.val();
+        d1 += '<tr>';
+        d1 += '<td>' + d2 + '</td>';
+        d1 += '</tr>';
+      });
+      dataTbl.append(d2);
+    });
+    document.getElementById("studatadiv").append(dataTbl);
+  }
+
+//reference the specific elements in the database
+//var ref = firebase.database().ref().child("IDNums/225413");
+
+//ref.once("value", function(snapshot) {
+  //snapshot.forEach(function(childSnapshot){
+    //d2 = childSnapshot.val();
+    //d1 +='<tr>';
+    //d1 += '<td>' + d2 + '</td>';
+    //d1 += '<td>' + d2 + '</td>';
+    //d1 += '<td>' + d2 + '</td>';
+    //d1 += '</tr>';
+  //});
+  //jQuery('#peace').append(d1);
+//});
+</script>
